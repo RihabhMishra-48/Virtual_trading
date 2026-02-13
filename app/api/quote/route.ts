@@ -14,10 +14,14 @@ export async function GET(request: NextRequest) {
 
         if (isIndianStock) {
             // Use Yahoo Finance for Indian stocks
-            const yahooSymbol = symbol;
-            const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}?interval=1d&range=1d`;
+            const yahooUrl = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1m&range=1d`;
 
-            const response = await fetch(yahooUrl, { cache: 'no-store' });
+            const response = await fetch(yahooUrl, {
+                cache: 'no-store',
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                }
+            });
 
             if (!response.ok) {
                 console.error(`Yahoo Finance API error: ${response.status}`);

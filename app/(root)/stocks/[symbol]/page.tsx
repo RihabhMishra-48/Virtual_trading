@@ -13,6 +13,7 @@ import { formatTradingViewSymbol } from "@/lib/utils";
 import { auth } from "@/lib/better-auth/auth";
 import { headers } from "next/headers";
 import { getStockQuote } from "@/lib/actions/finnhub.actions";
+import LivePrice from "@/components/VirtualTrading/LivePrice";
 import TradeDialog from "@/components/VirtualTrading/TradeDialog";
 
 export default async function StockDetails({ params }: StockDetailsPageProps) {
@@ -53,11 +54,14 @@ export default async function StockDetails({ params }: StockDetailsPageProps) {
           />
         </div>
 
-        {/* Right column */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 sticky top-8">
+          <div className="bg-gray-900/30 p-6 rounded-2xl border border-gray-800/50 backdrop-blur-sm">
+            <LivePrice symbol={symbol.toUpperCase()} initialPrice={currentPrice} />
+          </div>
+
           <div className="flex items-center justify-between gap-4">
             <WatchlistButton symbol={symbol.toUpperCase()} company={symbol.toUpperCase()} isInWatchlist={false} />
-            {user && currentPrice > 0 && (
+            {user && (
               <div className="flex-1">
                 <TradeDialog symbol={symbol.toUpperCase()} currentPrice={currentPrice} userId={user.id} />
               </div>

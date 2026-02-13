@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Wallet, TrendingUp, Plus, ArrowUpRight, ArrowDownRight, Loader2, Coins } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
-import { getPortfolio, topUpBalance } from "@/lib/actions/portfolio.actions";
+import { formatPrice, getCurrencyForSymbol } from "@/lib/utils";
+import { getPortfolioWithLivePrices, topUpBalance } from "@/lib/actions/portfolio.actions";
 import { toast } from "sonner";
 
 interface PortfolioSummaryProps {
@@ -13,13 +13,13 @@ interface PortfolioSummaryProps {
 }
 
 export default function PortfolioSummary({ userId }: PortfolioSummaryProps) {
-    const [portfolio, setPortfolio] = useState<IPortfolio | null>(null);
+    const [portfolio, setPortfolio] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [toppingUp, setToppingUp] = useState(false);
 
     const fetchPortfolio = async () => {
         try {
-            const data = await getPortfolio(userId);
+            const data = await getPortfolioWithLivePrices(userId);
             setPortfolio(data);
         } catch (error) {
             console.error("Failed to fetch portfolio", error);
@@ -56,13 +56,9 @@ export default function PortfolioSummary({ userId }: PortfolioSummaryProps) {
 
     if (!portfolio) return null;
 
-    // Calculate total value (mock calculation for now, ideally would fetch real-time prices for holdings)
-    // For this MVP, we will just show Balance + Cost basis of holdings as "Total Value" 
-    // ensuring we don't break if price APIs are rate limited.
-    // In a real app, we'd fetch current prices for all holdings here.
-    const holdingsValue = portfolio.holdings.reduce((acc, h) => acc + (h.quantity * h.averagePrice), 0);
-    const totalValue = portfolio.balance + holdingsValue;
-    const totalProfit = 0; // Placeholder for now until we integrate real-time price updates for the whole portfolio
+    const totalValue = portfolio.totalValue;
+    const totalProfitPercent = portfolio.totalProfitLossPercent;
+    const isProfit = portfolio.totalProfitLoss >= 0;
 
     return (
         <Card className="glass-card border-none text-white h-full relative overflow-hidden group">
@@ -101,10 +97,9 @@ export default function PortfolioSummary({ userId }: PortfolioSummaryProps) {
                             <p className="text-2xl font-bold tracking-tight text-white">
                                 {formatPrice(totalValue)}
                             </p>
-                            {/* Placeholder for daily change */}
-                            <span className="text-xs font-medium text-green-500 flex items-center">
-                                <ArrowUpRight className="h-3 w-3 mr-0.5" />
-                                +0.00%
+                            <span className={`text-xs font-medium flex items-center ${isProfit ? 'text-green-500' : 'text-red-500'}`}>
+                                {isProfit ? <ArrowUpRight className="h-3 w-3 mr-0.5" /> : <ArrowDownRight className="h-3 w-3 mr-0.5" />}
+                                {isProfit ? '+' : ''}{totalProfitPercent.toFixed(2)}%
                             </span>
                         </div>
                     </div>
@@ -127,10 +122,10 @@ export default function PortfolioSummary({ userId }: PortfolioSummaryProps) {
                                     </div>
                                     <div className="text-right">
                                         <div className="text-sm font-medium text-gray-200">
-                                            {formatPrice(holding.averagePrice * holding.quantity)}
+                                            {formatPrice(holding.currentPrice * holding.quantity, getCurrencyForSymbol(holding.symbol))}
                                         </div>
                                         <div className="text-[10px] text-gray-500">
-                                            Avg: {formatPrice(holding.averagePrice)}
+                                            Avg: {formatPrice(holding.averagePrice, getCurrencyForSymbol(holding.symbol))}
                                         </div>
                                     </div>
                                 </div>

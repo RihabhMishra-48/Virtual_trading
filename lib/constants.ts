@@ -185,12 +185,12 @@ export const MARKET_DATA_WIDGET_CONFIG = {
         {
             name: 'India (NSE)',
             symbols: [
-                { name: 'NSE:RELIANCE', displayName: 'Reliance Industries' },
-                { name: 'NSE:TCS', displayName: 'Tata Consultancy Svs' },
-                { name: 'NSE:HDFCBANK', displayName: 'HDFC Bank' },
-                { name: 'NSE:INFY', displayName: 'Infosys' },
-                { name: 'NSE:ICICIBANK', displayName: 'ICICI Bank' },
-                { name: 'NSE:SBIN', displayName: 'State Bank of India' },
+                { name: 'BSE:RELIANCE', displayName: 'Reliance Industries' },
+                { name: 'BSE:TCS', displayName: 'Tata Consultancy Svs' },
+                { name: 'BSE:HDFCBANK', displayName: 'HDFC Bank' },
+                { name: 'BSE:INFY', displayName: 'Infosys' },
+                { name: 'BSE:ICICIBANK', displayName: 'ICICI Bank' },
+                { name: 'BSE:SBIN', displayName: 'State Bank of India' },
             ],
         },
     ],

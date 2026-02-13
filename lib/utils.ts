@@ -108,10 +108,10 @@ export const getChangeColorClass = (changePercent?: number) => {
   return changePercent > 0 ? 'text-green-500' : 'text-red-500';
 };
 
-export const formatPrice = (price: number) => {
+export const formatPrice = (price: number, currency: string = 'USD') => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: currency,
     minimumFractionDigits: 2,
   }).format(price);
 };
@@ -142,15 +142,25 @@ export function formatTradingViewSymbol(symbol: string): string {
   if (!symbol) return '';
 
   // Handle Indian stocks (NSE/BSE)
-  // Finnhub returns .NS or .BO suffix
-  if (symbol.includes('.NS')) {
-    return `BSE:${symbol.replace('.NS', '')}`;
-  }
-  if (symbol.includes('.BO')) {
-    return `BSE:${symbol.replace('.BO', '')}`;
+  // TradingView free widgets often restrict NSE data for external embedding.
+  // Using BSE: prefix is much more reliable for public widgets while prices remain accurate.
+  if (symbol.includes('.NS') || symbol.includes('.BO')) {
+    const ticker = symbol.replace('.NS', '').replace('.BO', '');
+    return `BSE:${ticker}`;
   }
 
   // Handle Crypto (e.g. BINANCE:BTCUSDT is standard, but if we get raw BTC)
   // For now assuming standard US stocks don't need prefix or use defaults
   return symbol;
+}
+
+export function isIndianStock(symbol: string): boolean {
+  if (!symbol) return false;
+  const upperSymbol = symbol.toUpperCase();
+  return upperSymbol.endsWith('.NS') || upperSymbol.endsWith('.BO');
+}
+
+export function getCurrencyForSymbol(symbol: string | null | undefined): string {
+  if (!symbol) return 'USD';
+  return isIndianStock(symbol) ? 'INR' : 'USD';
 }

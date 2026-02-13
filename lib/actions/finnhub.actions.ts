@@ -181,6 +181,16 @@ export const searchStocks = cache(async (query?: string): Promise<StockWithWatch
 
 export async function getStockQuote(symbol: string): Promise<QuoteData> {
   try {
+    // Check if this is an Indian stock (NSE/BSE)
+    const { isIndianStock } = await import('@/lib/utils');
+    const { getIndianStockQuote } = await import('./indian-stock-api.actions');
+
+    if (isIndianStock(symbol)) {
+      // Route to Indian Stock Market API
+      return await getIndianStockQuote(symbol);
+    }
+
+    // Route to Finnhub for US and other stocks
     const token = process.env.FINNHUB_API_KEY ?? NEXT_PUBLIC_FINNHUB_API_KEY;
     if (!token) throw new Error("API Key missing");
 
@@ -192,5 +202,6 @@ export async function getStockQuote(symbol: string): Promise<QuoteData> {
     return { c: 0, dp: 0 };
   }
 }
+
 
 

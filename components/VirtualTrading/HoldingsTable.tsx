@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getCurrencyForSymbol } from "@/lib/utils";
 import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TradeDialog from "./TradeDialog";
@@ -54,7 +54,7 @@ export default function HoldingsTable({ holdings, userId, onTradeComplete }: Hol
         };
 
         fetchPrices();
-        const interval = setInterval(fetchPrices, 10000); // Update every 10 seconds
+        const interval = setInterval(fetchPrices, 1000); // Update every 1 second
 
         return () => clearInterval(interval);
     }, [holdings]);
@@ -106,19 +106,19 @@ export default function HoldingsTable({ holdings, userId, onTradeComplete }: Hol
                                             </div>
                                         </td>
                                         <td className="p-4 text-right text-gray-300 font-medium">{holding.quantity}</td>
-                                        <td className="p-4 text-right text-gray-400 font-mono text-sm">{formatPrice(holding.averagePrice)}</td>
+                                        <td className="p-4 text-right text-gray-400 font-mono text-sm">{formatPrice(holding.averagePrice, getCurrencyForSymbol(holding.symbol))}</td>
                                         <td className="p-4 text-right">
                                             <div className="flex flex-col items-end">
-                                                <span className="text-white font-mono font-bold">{formatPrice(livePrice)}</span>
+                                                <span className="text-white font-mono font-bold">{formatPrice(livePrice, getCurrencyForSymbol(holding.symbol))}</span>
                                                 <span className="text-xs text-gray-500">Live</span>
                                             </div>
                                         </td>
-                                        <td className="p-4 text-right text-white font-bold">{formatPrice(currentValue)}</td>
+                                        <td className="p-4 text-right text-white font-bold">{formatPrice(currentValue, getCurrencyForSymbol(holding.symbol))}</td>
                                         <td className="p-4 text-right">
                                             <div className={`flex flex-col items-end ${isProfit ? 'text-green-500' : 'text-red-500'}`}>
                                                 <span className="font-bold flex items-center gap-1">
                                                     {isProfit ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                                                    {isProfit ? '+' : ''}{formatPrice(profitLoss)}
+                                                    {isProfit ? '+' : ''}{formatPrice(profitLoss, getCurrencyForSymbol(holding.symbol))}
                                                 </span>
                                                 <span className="text-xs font-medium">
                                                     {isProfit ? '+' : ''}{profitLossPercent.toFixed(2)}%

@@ -158,52 +158,100 @@ export async function getPortfolioWithLivePrices(userId: string) {
 
     const portfolio = await getPortfolio(userId);
 
-    // Fetch live prices for all holdings
-    const holdingsWithPrices = await Promise.all(
-        portfolio.holdings.map(async (holding) => {
-            try {
-                const quote = await fetch(
-                    `https://finnhub.io/api/v1/quote?symbol=${holding.symbol}&token=${process.env.FINNHUB_API_KEY || process.env.NEXT_PUBLIC_FINNHUB_API_KEY}`
-                ).then(res => res.json());
+    if (portfolio.holdings.length === 0) {
+        return {
+            ...portfolio,
+            holdings: [],
+            totalInvested: 0,
+            totalCurrentValue: 0,
+            totalValue: portfolio.balance,
+            totalProfitLoss: 0,
+            totalProfitLossPercent: 0,
+        };
+    }
 
-                const currentPrice = quote.c || holding.averagePrice;
-                const totalValue = currentPrice * holding.quantity;
-                const totalCost = holding.averagePrice * holding.quantity;
-                const profitLoss = totalValue - totalCost;
-                const profitLossPercent = ((profitLoss / totalCost) * 100);
+    // Separate Indian and US stocks
+    const { isIndianStock } = await import('@/lib/utils');
+    const { getMultipleIndianStocks } = await import('./indian-stock-api.actions');
+    const { getStockQuote } = await import('./finnhub.actions');
 
-                return {
-                    ...holding,
-                    currentPrice,
-                    totalValue,
-                    profitLoss,
-                    profitLossPercent,
-                };
-            } catch (error) {
-                console.error(`Error fetching price for ${holding.symbol}:`, error);
-                return {
-                    ...holding,
-                    currentPrice: holding.averagePrice,
-                    totalValue: holding.averagePrice * holding.quantity,
-                    profitLoss: 0,
-                    profitLossPercent: 0,
-                };
-            }
-        })
-    );
+    const indianStocks = portfolio.holdings.filter(h => isIndianStock(h.symbol));
+    const usStocks = portfolio.holdings.filter(h => !isIndianStock(h.symbol));
 
-    const totalInvested = holdingsWithPrices.reduce((sum, h) => sum + (h.averagePrice * h.quantity), 0);
-    const totalCurrentValue = holdingsWithPrices.reduce((sum, h) => sum + h.totalValue, 0);
-    const totalProfitLoss = totalCurrentValue - totalInvested;
-    const totalProfitLossPercent = totalInvested > 0 ? (totalProfitLoss / totalInvested) * 100 : 0;
+    // Fetch Indian stocks in batch
+    let indianPrices = new Map<string, QuoteData>();
+    if (indianStocks.length > 0) {
+        try {
+            indianPrices = await getMultipleIndianStocks(indianStocks.map(h => h.symbol));
+        } catch (error) {
+            console.error('Error fetching Indian stock prices:', error);
+        }
+    }
+
+    // Fetch US stocks individually (could be optimized with batch API if needed)
+    const usPrices = new Map<string, QuoteData>();
+    if (usStocks.length > 0) {
+        await Promise.all(
+            usStocks.map(async (holding) => {
+                try {
+                    const quote = await getStockQuote(holding.symbol);
+                    usPrices.set(holding.symbol, quote);
+                } catch (error) {
+                    console.error(`Error fetching price for ${holding.symbol}:`, error);
+                    usPrices.set(holding.symbol, { c: 0, dp: 0 });
+                }
+            })
+        );
+    }
+
+    // Combine all prices
+    const allPrices = new Map([...indianPrices, ...usPrices]);
+
+    // Exchange rate for conversion (INR to USD)
+    const INR_TO_USD = 1 / 83; // Approx rate
+
+    // Calculate holdings with prices
+    const holdingsWithPrices = portfolio.holdings.map((holding) => {
+        const quote = allPrices.get(holding.symbol) || { c: 0, dp: 0 };
+        const currentPrice = quote.c || holding.averagePrice;
+        const isIndian = isIndianStock(holding.symbol);
+
+        // Convert to USD for global totals
+        const priceInUSD = isIndian ? (currentPrice * INR_TO_USD) : currentPrice;
+        const avgPriceInUSD = isIndian ? (holding.averagePrice * INR_TO_USD) : holding.averagePrice;
+
+        const totalValue = currentPrice * holding.quantity;
+        const totalValueUSD = priceInUSD * holding.quantity;
+        const totalCost = holding.averagePrice * holding.quantity;
+        const totalCostUSD = avgPriceInUSD * holding.quantity;
+
+        const profitLoss = totalValue - totalCost;
+        const profitLossPercent = totalCost > 0 ? ((profitLoss / totalCost) * 100) : 0;
+
+        return {
+            ...holding,
+            currentPrice,
+            totalValue,
+            totalValueUSD, // Added for backend calculations
+            totalCostUSD,  // Added for backend calculations
+            profitLoss,
+            profitLossPercent,
+        };
+    });
+
+    const totalInvestedUSD = holdingsWithPrices.reduce((sum, h) => sum + (h.totalCostUSD || 0), 0);
+    const totalCurrentValueUSD = holdingsWithPrices.reduce((sum, h) => sum + (h.totalValueUSD || 0), 0);
+    const totalProfitLossUSD = totalCurrentValueUSD - totalInvestedUSD;
+    const totalProfitLossPercent = totalInvestedUSD > 0 ? (totalProfitLossUSD / totalInvestedUSD) * 100 : 0;
 
     return {
         ...portfolio,
         holdings: holdingsWithPrices,
-        totalInvested,
-        totalCurrentValue,
-        totalValue: portfolio.balance + totalCurrentValue,
-        totalProfitLoss,
+        totalInvested: totalInvestedUSD,
+        totalCurrentValue: totalCurrentValueUSD,
+        totalValue: portfolio.balance + totalCurrentValueUSD,
+        totalProfitLoss: totalProfitLossUSD,
         totalProfitLossPercent,
     };
 }
+

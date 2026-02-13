@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, DollarSign, Wallet, TrendingUp, TrendingDown } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getCurrencyForSymbol } from "@/lib/utils";
 import { executeTrade, getPortfolio } from "@/lib/actions/portfolio.actions";
 import { toast } from "sonner";
 
@@ -29,8 +29,8 @@ export default function TradeDialog({ symbol, currentPrice, userId }: TradeDialo
             loadPortfolio();
             refreshPrice();
 
-            // Refresh price every 5 seconds while dialog is open
-            const interval = setInterval(refreshPrice, 5000);
+            // Refresh price every 1 second while dialog is open
+            const interval = setInterval(refreshPrice, 1000);
             return () => clearInterval(interval);
         }
     }, [open]);
@@ -72,7 +72,7 @@ export default function TradeDialog({ symbol, currentPrice, userId }: TradeDialo
             const result = await executeTrade(userId, symbol, type, qty, livePrice);
 
             if (result.success) {
-                toast.success(`Successfully ${type === 'BUY' ? 'bought' : 'sold'} ${qty} shares of ${symbol} at ${formatPrice(livePrice)}`);
+                toast.success(`Successfully ${type === 'BUY' ? 'bought' : 'sold'} ${qty} shares of ${symbol} at ${formatPrice(livePrice, getCurrencyForSymbol(symbol))}`);
                 setOpen(false);
             } else {
                 toast.error(result.error || "Trade failed");
@@ -90,7 +90,7 @@ export default function TradeDialog({ symbol, currentPrice, userId }: TradeDialo
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-lg shadow-lg shadow-blue-900/20">
-                    <DollarSign className="mr-2 h-5 w-5" />
+                    <TrendingUp className="mr-2 h-5 w-5" />
                     Trade {symbol}
                 </Button>
             </DialogTrigger>
@@ -99,7 +99,7 @@ export default function TradeDialog({ symbol, currentPrice, userId }: TradeDialo
                     <DialogTitle className="flex items-center gap-2 text-xl">
                         Trade <span className="text-blue-500 font-bold">{symbol}</span>
                         <span className="text-sm font-normal text-gray-500 ml-auto bg-gray-900 px-3 py-1 rounded-full border border-gray-800 flex items-center gap-2">
-                            {formatPrice(livePrice)}
+                            {formatPrice(livePrice, getCurrencyForSymbol(symbol))}
                             {priceLoading && <span className="inline-block h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>}
                         </span>
                     </DialogTitle>
@@ -117,7 +117,7 @@ export default function TradeDialog({ symbol, currentPrice, userId }: TradeDialo
                             <span className="text-gray-400 flex items-center gap-1">
                                 <Wallet className="h-3 w-3" /> Buying Power
                             </span>
-                            <span className="font-mono font-medium text-white">{formatPrice(portfolio?.balance || 0)}</span>
+                            <span className="font-mono font-medium text-white">{formatPrice(portfolio?.balance || 0, getCurrencyForSymbol(symbol))}</span>
                         </div>
                         <div className="flex justify-between items-center text-sm px-1">
                             <span className="text-gray-400 flex items-center gap-1">
@@ -147,7 +147,7 @@ export default function TradeDialog({ symbol, currentPrice, userId }: TradeDialo
                         <div className="bg-white/5 rounded-lg p-4 space-y-2 border border-white/5">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-400">Estimated Total</span>
-                                <span className="text-white font-bold">{formatPrice(totalCost)}</span>
+                                <span className="text-white font-bold">{formatPrice(totalCost, getCurrencyForSymbol(symbol))}</span>
                             </div>
                         </div>
 

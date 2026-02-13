@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, TrendingUp, Loader2, DollarSign } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getCurrencyForSymbol } from "@/lib/utils";
 import { searchStocks } from "@/lib/actions/finnhub.actions";
 import { executeTrade, getPortfolio } from "@/lib/actions/portfolio.actions";
 import { toast } from "sonner";
@@ -193,14 +193,12 @@ export default function QuickTradePanel({ userId, onTradeComplete }: QuickTradeP
                             <>
                                 <div className="flex justify-between items-center text-sm px-1">
                                     <span className="text-gray-400">Current Price</span>
-                                    <span className="font-mono font-bold text-white text-lg">{formatPrice(currentPrice)}</span>
+                                    <span className="font-mono font-bold text-white text-lg">{formatPrice(currentPrice, getCurrencyForSymbol(selectedStock.symbol))}</span>
                                 </div>
 
                                 <div className="flex justify-between items-center text-sm px-1">
-                                    <span className="text-gray-400 flex items-center gap-1">
-                                        <DollarSign className="h-3 w-3" /> Buying Power
-                                    </span>
-                                    <span className="font-mono font-medium text-white">{formatPrice(balance)}</span>
+                                    <span className="text-gray-400">Buying Power</span>
+                                    <span className="font-mono font-medium text-white">{formatPrice(balance, getCurrencyForSymbol(selectedStock.symbol))}</span>
                                 </div>
 
                                 <div className="space-y-2">
@@ -217,7 +215,7 @@ export default function QuickTradePanel({ userId, onTradeComplete }: QuickTradeP
                                 <div className="bg-white/5 rounded-lg p-4 border border-white/5">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-400">Estimated Total</span>
-                                        <span className="text-white font-bold">{formatPrice(totalCost)}</span>
+                                        <span className="text-white font-bold">{formatPrice(totalCost, getCurrencyForSymbol(selectedStock.symbol))}</span>
                                     </div>
                                 </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { formatTimeAgo, formatPrice } from "@/lib/utils";
+import { formatTimeAgo, formatPrice, getCurrencyForSymbol } from "@/lib/utils";
 import { ArrowUpRight, ArrowDownRight, Plus, Clock } from "lucide-react";
 
 interface Transaction {
@@ -60,7 +60,7 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
                                     </td>
                                     <td className="p-4">
                                         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold ${isDeposit ? 'bg-purple-500/10 text-purple-400' :
-                                                isBuy ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
+                                            isBuy ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
                                             }`}>
                                             {isDeposit ? <Plus className="h-3 w-3" /> :
                                                 isBuy ? <ArrowDownRight className="h-3 w-3" /> : <ArrowUpRight className="h-3 w-3" />}
@@ -69,8 +69,8 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
                                     </td>
                                     <td className="p-4 text-white font-bold">{tx.symbol}</td>
                                     <td className="p-4 text-right text-gray-300 font-medium">{tx.quantity}</td>
-                                    <td className="p-4 text-right text-gray-300 font-mono text-sm">{formatPrice(tx.price)}</td>
-                                    <td className="p-4 text-right text-white font-bold">{formatPrice(tx.totalAmount)}</td>
+                                    <td className="p-4 text-right text-gray-300 font-mono text-sm">{formatPrice(tx.price, getCurrencyForSymbol(tx.symbol))}</td>
+                                    <td className="p-4 text-right text-white font-bold">{formatPrice(tx.totalAmount, tx.type === 'DEPOSIT' ? 'USD' : getCurrencyForSymbol(tx.symbol))}</td>
                                 </tr>
                             );
                         })}
