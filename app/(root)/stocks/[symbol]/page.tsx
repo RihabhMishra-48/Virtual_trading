@@ -10,7 +10,7 @@ import {
 } from "@/lib/constants";
 
 import { formatTradingViewSymbol } from "@/lib/utils";
-import { auth } from "@/lib/better-auth/auth";
+import { getAuth } from "@/lib/better-auth/auth";
 import { headers } from "next/headers";
 import { getStockQuote } from "@/lib/actions/finnhub.actions";
 import LivePrice from "@/components/VirtualTrading/LivePrice";
@@ -21,6 +21,7 @@ export default async function StockDetails({ params }: StockDetailsPageProps) {
   const formattedSymbol = formatTradingViewSymbol(symbol?.toUpperCase() || "");
   const scriptUrl = `https://s3.tradingview.com/external-embedding/embed-widget-`;
 
+  const auth = await getAuth();
   const session = await auth.api.getSession({ headers: await headers() });
   const user = session?.user;
 

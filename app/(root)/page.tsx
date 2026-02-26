@@ -4,7 +4,7 @@ import {
     MARKET_OVERVIEW_WIDGET_CONFIG,
     TOP_STORIES_WIDGET_CONFIG
 } from "@/lib/constants";
-import { auth } from "@/lib/better-auth/auth";
+import { getAuth } from "@/lib/better-auth/auth";
 import { headers } from "next/headers";
 import MarketStatus from "@/components/Dashboard/MarketStatus";
 import IndexCard from "@/components/Dashboard/IndexCard";
@@ -30,6 +30,7 @@ const LOSERS_MOCK = [
 ];
 
 const Home = async () => {
+    const auth = await getAuth();
     const session = await auth.api.getSession({ headers: await headers() });
 
     const scriptUrl = `https://s3.tradingview.com/external-embedding/embed-widget-`;
