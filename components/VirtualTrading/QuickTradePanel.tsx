@@ -119,10 +119,10 @@ export default function QuickTradePanel({ userId, onTradeComplete }: QuickTradeP
     const totalCost = (parseInt(quantity) || 0) * currentPrice;
 
     return (
-        <Card className="glass-card border-none text-white">
+        <Card className="glass-card border-none text-foreground">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-blue-400" />
+                    <TrendingUp className="h-5 w-5 text-blue-500" />
                     Quick Trade
                 </CardTitle>
             </CardHeader>
@@ -132,13 +132,13 @@ export default function QuickTradePanel({ userId, onTradeComplete }: QuickTradeP
                     <div className="space-y-2">
                         <div className="flex gap-2">
                             <div className="relative flex-1">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
                                     placeholder="Search stocks (e.g., AAPL, TSLA)..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                                    className="pl-10 bg-gray-900/50 border-gray-800 text-white"
+                                    className="pl-10 bg-muted/20 border-border text-foreground"
                                 />
                             </div>
                             <Button onClick={handleSearch} disabled={searching} className="bg-blue-600 hover:bg-blue-700">
@@ -148,15 +148,15 @@ export default function QuickTradePanel({ userId, onTradeComplete }: QuickTradeP
 
                         {/* Search Results */}
                         {searchResults.length > 0 && (
-                            <div className="bg-gray-900/50 rounded-lg border border-gray-800 max-h-60 overflow-y-auto">
+                            <div className="bg-popover rounded-lg border border-border max-h-60 overflow-y-auto shadow-xl">
                                 {searchResults.map((stock) => (
                                     <button
                                         key={stock.symbol}
                                         onClick={() => selectStock(stock)}
-                                        className="w-full p-3 hover:bg-white/5 transition-colors text-left border-b border-gray-800/50 last:border-0"
+                                        className="w-full p-3 hover:bg-accent transition-colors text-left border-b border-border/50 last:border-0"
                                     >
-                                        <div className="font-bold text-white">{stock.symbol}</div>
-                                        <div className="text-sm text-gray-400">{stock.name}</div>
+                                        <div className="font-bold text-foreground">{stock.symbol}</div>
+                                        <div className="text-sm text-muted-foreground">{stock.name}</div>
                                     </button>
                                 ))}
                             </div>
@@ -167,10 +167,10 @@ export default function QuickTradePanel({ userId, onTradeComplete }: QuickTradeP
                 {/* Selected Stock Trading */}
                 {selectedStock && (
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-blue-600/10 rounded-lg border border-blue-600/20">
+                        <div className="flex items-center justify-between p-4 bg-primary/10 rounded-lg border border-primary/20">
                             <div>
-                                <div className="font-bold text-xl text-white">{selectedStock.symbol}</div>
-                                <div className="text-sm text-gray-400">{selectedStock.name}</div>
+                                <div className="font-bold text-xl text-foreground">{selectedStock.symbol}</div>
+                                <div className="text-sm text-muted-foreground">{selectedStock.name}</div>
                             </div>
                             <Button
                                 variant="ghost"
@@ -179,7 +179,7 @@ export default function QuickTradePanel({ userId, onTradeComplete }: QuickTradeP
                                     setSelectedStock(null);
                                     setCurrentPrice(0);
                                 }}
-                                className="text-gray-400 hover:text-white"
+                                className="text-muted-foreground hover:text-foreground"
                             >
                                 Change
                             </Button>
@@ -192,35 +192,35 @@ export default function QuickTradePanel({ userId, onTradeComplete }: QuickTradeP
                         ) : (
                             <>
                                 <div className="flex justify-between items-center text-sm px-1">
-                                    <span className="text-gray-400">Current Price</span>
-                                    <span className="font-mono font-bold text-white text-lg">{formatPrice(currentPrice, getCurrencyForSymbol(selectedStock.symbol))}</span>
+                                    <span className="text-muted-foreground">Current Price</span>
+                                    <span className="font-mono font-bold text-foreground text-lg">{formatPrice(currentPrice, getCurrencyForSymbol(selectedStock.symbol))}</span>
                                 </div>
 
                                 <div className="flex justify-between items-center text-sm px-1">
-                                    <span className="text-gray-400">Buying Power</span>
-                                    <span className="font-mono font-medium text-white">{formatPrice(balance, getCurrencyForSymbol(selectedStock.symbol))}</span>
+                                    <span className="text-muted-foreground">Buying Power</span>
+                                    <span className="font-mono font-medium text-foreground">{formatPrice(balance, getCurrencyForSymbol(selectedStock.symbol))}</span>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-medium text-gray-500 uppercase">Quantity</label>
+                                    <label className="text-xs font-medium text-muted-foreground uppercase">Quantity</label>
                                     <Input
                                         type="number"
                                         min="1"
                                         value={quantity}
                                         onChange={(e) => setQuantity(e.target.value)}
-                                        className="bg-gray-900/50 border-gray-800 text-white text-lg h-12"
+                                        className="bg-muted/20 border-border text-foreground text-lg h-12"
                                     />
                                 </div>
 
-                                <div className="bg-white/5 rounded-lg p-4 border border-white/5">
+                                <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-400">Estimated Total</span>
-                                        <span className="text-white font-bold">{formatPrice(totalCost, getCurrencyForSymbol(selectedStock.symbol))}</span>
+                                        <span className="text-muted-foreground">Estimated Total</span>
+                                        <span className="text-foreground font-bold">{formatPrice(totalCost, getCurrencyForSymbol(selectedStock.symbol))}</span>
                                     </div>
                                 </div>
 
                                 <Tabs defaultValue="buy" className="w-full">
-                                    <TabsList className="grid w-full grid-cols-2 bg-gray-900/50">
+                                    <TabsList className="grid w-full grid-cols-2 bg-muted">
                                         <TabsTrigger value="buy">Buy</TabsTrigger>
                                         <TabsTrigger value="sell">Sell</TabsTrigger>
                                     </TabsList>

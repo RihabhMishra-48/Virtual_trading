@@ -26,9 +26,9 @@ const UserDropdown = ({ user, initialStocks }: { user: User, initialStocks: Stoc
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+                <Button variant="ghost" className="flex items-center gap-3 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                     <div className="flex flex-col items-start" suppressHydrationWarning>
-                        <span className='text-base font-medium text-gray-200'>
+                        <span className='text-base font-medium text-foreground'>
                             {user.name}
                         </span>
                     </div>
@@ -47,12 +47,12 @@ const UserDropdown = ({ user, initialStocks }: { user: User, initialStocks: Stoc
                             <span className='text-base font-medium text-white'>
                                 {user.name}
                             </span>
-                            <span className="text-xs text-gray-500">{user.email}</span>
+                            <span className="text-xs text-muted-foreground">{user.email}</span>
                         </div>
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem onClick={handleSignOut} className="text-gray-300 text-md font-medium focus:bg-white/10 focus:text-white transition-colors cursor-pointer">
+                <DropdownMenuItem onClick={handleSignOut} className="text-foreground text-md font-medium focus:bg-accent focus:text-accent-foreground transition-colors cursor-pointer">
                     <LogOut className="h-4 w-4 mr-2 hidden sm:block" />
                     Logout
                 </DropdownMenuItem>

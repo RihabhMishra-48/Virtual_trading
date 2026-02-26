@@ -232,13 +232,33 @@ export async function getPortfolioWithLivePrices(userId: string) {
             ...holding,
             currentPrice,
             totalValue,
-            totalValueUSD, // Added for backend calculations
-            totalCostUSD,  // Added for backend calculations
+            totalValueUSD,
+            totalCostUSD,
             profitLoss,
             profitLossPercent,
+            currency: isIndian ? 'INR' : 'USD'
         };
     });
 
+    // Bucket aggregates
+    const usdHoldings = holdingsWithPrices.filter(h => h.currency === 'USD');
+    const inrHoldings = holdingsWithPrices.filter(h => h.currency === 'INR');
+
+    const statsUSD = {
+        invested: usdHoldings.reduce((sum, h) => sum + (h.totalCostUSD || 0), 0),
+        currentValue: usdHoldings.reduce((sum, h) => sum + (h.totalValueUSD || 0), 0),
+    };
+    statsUSD.profitLoss = statsUSD.currentValue - statsUSD.invested;
+    statsUSD.profitLossPercent = statsUSD.invested > 0 ? (statsUSD.profitLoss / statsUSD.invested) * 100 : 0;
+
+    const statsINR = {
+        invested: inrHoldings.reduce((sum, h) => sum + (h.totalValue - h.profitLoss), 0),
+        currentValue: inrHoldings.reduce((sum, h) => sum + h.totalValue, 0),
+    };
+    statsINR.profitLoss = statsINR.currentValue - statsINR.invested;
+    statsINR.profitLossPercent = statsINR.invested > 0 ? (statsINR.profitLoss / statsINR.invested) * 100 : 0;
+
+    // Global totals (in USD)
     const totalInvestedUSD = holdingsWithPrices.reduce((sum, h) => sum + (h.totalCostUSD || 0), 0);
     const totalCurrentValueUSD = holdingsWithPrices.reduce((sum, h) => sum + (h.totalValueUSD || 0), 0);
     const totalProfitLossUSD = totalCurrentValueUSD - totalInvestedUSD;
@@ -247,6 +267,8 @@ export async function getPortfolioWithLivePrices(userId: string) {
     return {
         ...portfolio,
         holdings: holdingsWithPrices,
+        statsUSD,
+        statsINR,
         totalInvested: totalInvestedUSD,
         totalCurrentValue: totalCurrentValueUSD,
         totalValue: portfolio.balance + totalCurrentValueUSD,

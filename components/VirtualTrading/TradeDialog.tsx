@@ -94,11 +94,11 @@ export default function TradeDialog({ symbol, currentPrice, userId }: TradeDialo
                     Trade {symbol}
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md bg-[#0E0E10] border-gray-800 text-gray-100">
+            <DialogContent className="sm:max-w-md bg-background border-border text-foreground">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-xl">
                         Trade <span className="text-blue-500 font-bold">{symbol}</span>
-                        <span className="text-sm font-normal text-gray-500 ml-auto bg-gray-900 px-3 py-1 rounded-full border border-gray-800 flex items-center gap-2">
+                        <span className="text-sm font-normal text-muted-foreground ml-auto bg-muted px-3 py-1 rounded-full border border-border flex items-center gap-2">
                             {formatPrice(livePrice, getCurrencyForSymbol(symbol))}
                             {priceLoading && <span className="inline-block h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>}
                         </span>
@@ -106,7 +106,7 @@ export default function TradeDialog({ symbol, currentPrice, userId }: TradeDialo
                 </DialogHeader>
 
                 <Tabs defaultValue="buy" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 bg-gray-900/50">
+                    <TabsList className="grid w-full grid-cols-2 bg-muted">
                         <TabsTrigger value="buy" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Buy</TabsTrigger>
                         <TabsTrigger value="sell" className="data-[state=active]:bg-red-600 data-[state=active]:text-white">Sell</TabsTrigger>
                     </TabsList>
@@ -114,40 +114,40 @@ export default function TradeDialog({ symbol, currentPrice, userId }: TradeDialo
                     <div className="mt-6 space-y-4">
                         {/* Balance Info */}
                         <div className="flex justify-between items-center text-sm px-1">
-                            <span className="text-gray-400 flex items-center gap-1">
+                            <span className="text-muted-foreground flex items-center gap-1">
                                 <Wallet className="h-3 w-3" /> Buying Power
                             </span>
-                            <span className="font-mono font-medium text-white">{formatPrice(portfolio?.balance || 0, getCurrencyForSymbol(symbol))}</span>
+                            <span className="font-mono font-medium text-foreground">{formatPrice(portfolio?.balance || 0, getCurrencyForSymbol(symbol))}</span>
                         </div>
                         <div className="flex justify-between items-center text-sm px-1">
-                            <span className="text-gray-400 flex items-center gap-1">
+                            <span className="text-muted-foreground flex items-center gap-1">
                                 <TrendingUp className="h-3 w-3" /> Your Position
                             </span>
-                            <span className="font-mono font-medium text-white">{getHolding()} shares</span>
+                            <span className="font-mono font-medium text-foreground">{getHolding()} shares</span>
                         </div>
 
                         {/* Input */}
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-gray-500 uppercase">Quantity</label>
+                            <label className="text-xs font-medium text-muted-foreground uppercase">Quantity</label>
                             <div className="relative">
                                 <Input
                                     type="number"
                                     min="1"
                                     value={quantity}
                                     onChange={(e) => setQuantity(e.target.value)}
-                                    className="bg-gray-900/50 border-gray-800 text-white text-lg h-12 pl-4 pr-12 focus-visible:ring-blue-500/50"
+                                    className="bg-muted/20 border-border text-foreground text-lg h-12 pl-4 pr-12 focus-visible:ring-blue-500/50"
                                 />
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium pointer-events-none">
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none">
                                     qty
                                 </div>
                             </div>
                         </div>
 
                         {/* Summary */}
-                        <div className="bg-white/5 rounded-lg p-4 space-y-2 border border-white/5">
+                        <div className="bg-muted/30 rounded-lg p-4 space-y-2 border border-border/50">
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-400">Estimated Total</span>
-                                <span className="text-white font-bold">{formatPrice(totalCost, getCurrencyForSymbol(symbol))}</span>
+                                <span className="text-muted-foreground">Estimated Total</span>
+                                <span className="text-foreground font-bold">{formatPrice(totalCost, getCurrencyForSymbol(symbol))}</span>
                             </div>
                         </div>
 

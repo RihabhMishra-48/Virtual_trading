@@ -19,13 +19,19 @@ interface TradingClientProps {
 export default function TradingClient({ userId, initialPortfolio, initialTransactions }: TradingClientProps) {
     const [portfolio, setPortfolio] = useState(initialPortfolio);
     const [transactions, setTransactions] = useState(initialTransactions);
+    const [refreshing, setRefreshing] = useState(false);
 
     const refreshData = async () => {
-        // Refresh portfolio and transactions after trade
-        const newPortfolio = await getPortfolioWithLivePrices(userId);
-        const newTransactions = await getTransactionHistory(userId, 20);
-        setPortfolio(newPortfolio);
-        setTransactions(newTransactions);
+        setRefreshing(true);
+        try {
+            // Refresh portfolio and transactions after trade
+            const newPortfolio = await getPortfolioWithLivePrices(userId);
+            const newTransactions = await getTransactionHistory(userId, 20);
+            setPortfolio(newPortfolio);
+            setTransactions(newTransactions);
+        } finally {
+            setRefreshing(false);
+        }
     };
 
     const stats = {
@@ -35,6 +41,8 @@ export default function TradingClient({ userId, initialPortfolio, initialTransac
         totalValue: portfolio.totalValue || portfolio.balance,
         totalProfitLoss: portfolio.totalProfitLoss || 0,
         totalProfitLossPercent: portfolio.totalProfitLossPercent || 0,
+        statsUSD: portfolio.statsUSD,
+        statsINR: portfolio.statsINR,
     };
 
     return (
@@ -43,13 +51,13 @@ export default function TradingClient({ userId, initialPortfolio, initialTransac
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-4xl font-bold text-white mb-2">Trading Dashboard</h1>
-                        <p className="text-gray-400">Manage your virtual portfolio and track performance</p>
+                        <h1 className="text-4xl font-bold text-foreground mb-2">Trading Dashboard</h1>
+                        <p className="text-muted-foreground">Manage your virtual portfolio and track performance</p>
                     </div>
                 </div>
 
                 {/* Portfolio Stats */}
-                <PortfolioOverview stats={stats} />
+                <PortfolioOverview stats={stats} loading={refreshing} />
 
                 {/* Quick Trade + Holdings Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -60,8 +68,8 @@ export default function TradingClient({ userId, initialPortfolio, initialTransac
 
                     {/* Holdings */}
                     <div className="lg:col-span-2">
-                        <h2 className="text-2xl font-bold text-white mb-4">Your Holdings</h2>
-                        <HoldingsTable holdings={portfolio.holdings} userId={userId} onTradeComplete={refreshData} />
+                        <h2 className="text-2xl font-bold text-foreground mb-4">Your Holdings</h2>
+                        <HoldingsTable holdings={portfolio.holdings} userId={userId} onTradeComplete={refreshData} loading={refreshing} />
                     </div>
                 </div>
 
