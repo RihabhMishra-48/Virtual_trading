@@ -153,7 +153,7 @@ export async function getTransactionHistory(userId: string, limit: number = 50):
 }
 
 // Get portfolio with live prices
-export async function getPortfolioWithLivePrices(userId: string) {
+export async function getPortfolioWithLivePrices(userId: string): Promise<IPortfolio> {
     if (!userId) throw new Error("Unauthorized");
 
     const portfolio = await getPortfolio(userId);
@@ -167,6 +167,8 @@ export async function getPortfolioWithLivePrices(userId: string) {
             totalValue: portfolio.balance,
             totalProfitLoss: 0,
             totalProfitLossPercent: 0,
+            statsUSD: { invested: 0, currentValue: 0, profitLoss: 0, profitLossPercent: 0 },
+            statsINR: { invested: 0, currentValue: 0, profitLoss: 0, profitLossPercent: 0 },
         };
     }
 
@@ -236,7 +238,7 @@ export async function getPortfolioWithLivePrices(userId: string) {
             totalCostUSD,
             profitLoss,
             profitLossPercent,
-            currency: isIndian ? 'INR' : 'USD'
+            currency: (isIndian ? 'INR' : 'USD') as 'INR' | 'USD'
         };
     });
 
@@ -244,16 +246,20 @@ export async function getPortfolioWithLivePrices(userId: string) {
     const usdHoldings = holdingsWithPrices.filter(h => h.currency === 'USD');
     const inrHoldings = holdingsWithPrices.filter(h => h.currency === 'INR');
 
-    const statsUSD = {
+    const statsUSD: CurrencyStats = {
         invested: usdHoldings.reduce((sum, h) => sum + (h.totalCostUSD || 0), 0),
         currentValue: usdHoldings.reduce((sum, h) => sum + (h.totalValueUSD || 0), 0),
+        profitLoss: 0,
+        profitLossPercent: 0
     };
     statsUSD.profitLoss = statsUSD.currentValue - statsUSD.invested;
     statsUSD.profitLossPercent = statsUSD.invested > 0 ? (statsUSD.profitLoss / statsUSD.invested) * 100 : 0;
 
-    const statsINR = {
+    const statsINR: CurrencyStats = {
         invested: inrHoldings.reduce((sum, h) => sum + (h.totalValue - h.profitLoss), 0),
         currentValue: inrHoldings.reduce((sum, h) => sum + h.totalValue, 0),
+        profitLoss: 0,
+        profitLossPercent: 0
     };
     statsINR.profitLoss = statsINR.currentValue - statsINR.invested;
     statsINR.profitLossPercent = statsINR.invested > 0 ? (statsINR.profitLoss / statsINR.invested) * 100 : 0;

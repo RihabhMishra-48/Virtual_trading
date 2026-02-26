@@ -221,14 +221,40 @@ declare global {
         symbol: string;
         quantity: number;
         averagePrice: number;
+        currentPrice: number;
+    };
+
+    type CurrencyStats = {
+        invested: number;
+        currentValue: number;
+        profitLoss: number;
+        profitLossPercent: number;
     };
 
     type IPortfolio = {
         userId: string;
         balance: number;
-        holdings: PortfolioHolding[];
-        totalValue?: number; // Calculated field (balance + holdings value)
-        totalProfitLoss?: number; // Calculated field
+        holdings: (PortfolioHolding & {
+            totalValue: number;
+            totalValueUSD: number;
+            totalCostUSD: number;
+            profitLoss: number;
+            profitLossPercent: number;
+            currency: 'USD' | 'INR';
+        })[];
+        totalInvested: number;
+        totalCurrentValue: number;
+        totalValue: number;
+        totalProfitLoss: number;
+        totalProfitLossPercent: number;
+        statsUSD: CurrencyStats;
+        statsINR: CurrencyStats;
+    };
+
+    type UserForNewsEmail = {
+        id: string;
+        email: string;
+        name: string;
     };
 
     type TransactionType = 'BUY' | 'SELL' | 'DEPOSIT';

@@ -13,13 +13,13 @@ interface PortfolioSummaryProps {
 }
 
 export default function PortfolioSummary({ userId }: PortfolioSummaryProps) {
-    const [portfolio, setPortfolio] = useState<any>(null);
+    const [portfolio, setPortfolio] = useState<IPortfolio | null>(null);
     const [loading, setLoading] = useState(true);
     const [toppingUp, setToppingUp] = useState(false);
 
     const fetchPortfolio = async () => {
         try {
-            const data = await getPortfolioWithLivePrices(userId);
+            const data = await getPortfolioWithLivePrices(userId) as IPortfolio;
             setPortfolio(data);
         } catch (error) {
             console.error("Failed to fetch portfolio", error);
@@ -130,7 +130,7 @@ export default function PortfolioSummary({ userId }: PortfolioSummaryProps) {
                         </div>
                     ) : (
                         <div className="space-y-2 max-h-[120px] overflow-y-auto custom-scrollbar pr-1">
-                            {portfolio.holdings.map((holding) => (
+                            {portfolio.holdings.map((holding: PortfolioHolding) => (
                                 <div key={holding.symbol} className="flex items-center justify-between p-2 rounded bg-muted/20 hover:bg-muted/40 transition-colors">
                                     <div className="flex items-center gap-2">
                                         <span className="font-bold text-sm text-foreground">{holding.symbol}</span>
