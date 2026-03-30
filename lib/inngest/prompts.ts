@@ -229,3 +229,26 @@ EXAMPLES:
 
 Your response must be valid JSON only. Do not include any other text.`
 
+
+export const AI_STOCK_RECOMMENDATION_PROMPT = `You are an expert financial analyst. Your task is to provide a "Buy", "Sell", or "Hold" recommendation for a given stock based on the latest news provided.
+
+Stock Symbol: {{symbol}}
+News Data:
+{{newsData}}
+
+REQUIREMENTS:
+1. **Verdict**: Choose exactly one from "Buy", "Sell", or "Hold".
+2. **Reasoning**: Provide a clear, concise explanation (2-3 sentences) for your verdict.
+3. **News References**: Mention specific news headlines or events from the provided data that influenced your decision. Use "As per [News Headline]..." or similar phrases.
+4. **Tone**: Professional, objective, and easy to understand.
+5. **Language**: English.
+
+RESPONSE FORMAT:
+Return ONLY a valid JSON object with this exact structure:
+{
+  "verdict": "Buy|Sell|Hold",
+  "reason": "Detailed reasoning here focusing on the provided news.",
+  "newsReferences": ["Headline 1", "Headline 2"]
+}
+
+Your response must be valid JSON only. Do not include any other text.`

@@ -1,9 +1,3 @@
-import TradingViewWidget from "@/components/TradingViewWidget";
-import {
-    MARKET_DATA_WIDGET_CONFIG,
-    MARKET_OVERVIEW_WIDGET_CONFIG,
-    TOP_STORIES_WIDGET_CONFIG
-} from "@/lib/constants";
 import { getAuth } from "@/lib/better-auth/auth";
 import { headers } from "next/headers";
 import MarketStatus from "@/components/Dashboard/MarketStatus";
@@ -12,6 +6,8 @@ import SectorPerformance from "@/components/SectorPerformance";
 import StockListCard from "@/components/Dashboard/StockListCard";
 import MarketBreadth from "@/components/Dashboard/MarketBreadth";
 import Watchlist from "@/components/Dashboard/Watchlist";
+import MarketQuotesPanel from "@/components/Dashboard/MarketQuotesPanel";
+import LatestNewsPanel from "@/components/Dashboard/LatestNewsPanel";
 
 const GAINERS_MOCK = [
     { symbol: "TATAELXSI", name: "Tata Elxsi Ltd", price: 7850.40, changePercent: 5.42 },
@@ -32,8 +28,6 @@ const LOSERS_MOCK = [
 const Home = async () => {
     const auth = await getAuth();
     const session = await auth.api.getSession({ headers: await headers() });
-
-    const scriptUrl = `https://s3.tradingview.com/external-embedding/embed-widget-`;
 
     return (
         <div className="home-wrapper max-w-[1600px] mx-auto p-4 md:p-6 space-y-8" suppressHydrationWarning>
@@ -78,22 +72,14 @@ const Home = async () => {
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-sm font-black uppercase tracking-widest text-muted-foreground">Market Quotes</h3>
                         </div>
-                        <TradingViewWidget
-                            scriptUrl={`${scriptUrl}market-quotes.js`}
-                            config={{ ...MARKET_DATA_WIDGET_CONFIG, height: 400 }}
-                            height={400}
-                        />
+                        <MarketQuotesPanel />
                     </div>
 
                     <div className="bg-card border border-border/50 rounded-2xl p-5 shadow-sm">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-sm font-black uppercase tracking-widest text-muted-foreground">Latest News</h3>
                         </div>
-                        <TradingViewWidget
-                            scriptUrl={`${scriptUrl}timeline.js`}
-                            config={{ ...TOP_STORIES_WIDGET_CONFIG, height: 350 }}
-                            height={350}
-                        />
+                        <LatestNewsPanel />
                     </div>
                 </div>
             </div>
@@ -102,3 +88,4 @@ const Home = async () => {
 };
 
 export default Home;
+

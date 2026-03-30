@@ -1,9 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { auth } from "@/lib/better-auth/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { getPortfolioWithLivePrices, getTransactionHistory } from "@/lib/actions/portfolio.actions";
 import PortfolioOverview from "@/components/VirtualTrading/PortfolioOverview";
 import HoldingsTable from "@/components/VirtualTrading/HoldingsTable";
